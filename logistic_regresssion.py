@@ -5,8 +5,10 @@ import torch.optim as optim
 
 import numpy as np
 
+from word_encoding import WordEncodingAuto
+
 WORD_EMBEDDING_SIZE = 100
-LEARNING_RATE = 0.01    # experiment with this
+LEARNING_RATE = 0.01  # experiment with this
 BATCH_SIZE = 128
 
 
@@ -17,7 +19,7 @@ def test_network(model, test_data, test_labels):
         for i in range(test_data_size):
             lyrics = test_data[i]
             label = test_labels[i]
-            word_vec = LogisticRegressionClassifier.song_lyrics_to_word_average(lyrics)
+            word_vec = model.song_lyrics_to_word_average(lyrics)
             probability = model(word_vec)
             _, prediction = torch.max(probability, 1)
             if (prediction == label):
@@ -40,7 +42,7 @@ def train_network(train_data, train_labels, epochs):
         for batch_id in range(batch_count):
             start_index = batch_id * BATCH_SIZE
             end_index = (batch_id + 1) * BATCH_SIZE
-            train_batch = train_data[:, start_index : end_index]
+            train_batch = train_data[:, start_index: end_index]
             hot_batch = train_labels[:, start_index:end_index]
 
             probabilities = model(train_batch)
@@ -51,20 +53,17 @@ def train_network(train_data, train_labels, epochs):
     return model
 
 
-def word_to_glove(word):
-    return np.random.randn(WORD_EMBEDDING_SIZE).reshape(1, -1)
-
-
 class LogisticRegressionClassifier(nn.Module):
     def __init__(self, genre_count=10):
         super(LogisticRegressionClassifier, self).__init__()
         self.linear = nn.linear(WORD_EMBEDDING_SIZE, genre_count)
+        self.word_encoder = WordEncodingAuto()
+
+    def word_to_glove(self, word):
+        return self.word_encoder.get_word_vector(word).reshape(1, -1)
 
     def forward(self, song_word_average_batch):
         return F.softmax(self.linear(song_word_average_batch), dim=1)
 
-    @staticmethod
-    def song_lyrics_to_word_average(song_lyrics):
-        return torch.from_numpy(np.mean(np.array([word_to_glove(word) for word in song_lyrics]), axis=0))
-
-
+    def song_lyrics_to_word_average(self, song_lyrics):
+        return torch.from_numpy(np.mean(np.array([self.word_to_glove(word) for word in song_lyrics]), axis=0))
