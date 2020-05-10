@@ -1,6 +1,7 @@
-import csv
-import math
 import pandas as pd
+import re
+import matplotlib.pyplot as plt
+import langdetect
 
 file = pd.read_csv('lyrics.csv')
 print('Initial number of rows: {}'.format(file.shape[0]))
@@ -14,6 +15,11 @@ file = file.drop('year', 1)
 print('Removing songs with no lyrics')
 file = file.dropna()
 print('Current rows: {}'.format(file.shape[0]))
+
+
+## REMOVE SONG WITH GENRE LISTED AS 'OTHER' OR 'NOT AVAILABLE' ##
+file = file[file.genre != 'Other']
+file = file[file.genre != 'Not Available']
 
 
 ## REMOVE SONG WITH ONLY ONE VERSE ##
@@ -45,57 +51,33 @@ print('Removing songs with no spaces inbetween words')
 file = file[file.lyrics.str.count(' ') != 0]
 print('Current rows: {}'.format(file.shape[0]))
 
-# todo
-# english only
-# average length of verse per song
-# average number of words per genre
-# average number of sentences per genre
-# average number of verses per genre
-# amount of genres
-# amount of subgenres
 
-def word_counter(song):
-    # probably will also add , as a separator of sentences
-    sentence_list = re.split('\n|\s', song)
-    return list(filter(None, sentence_list))
+## REMOVE SONGS NOT IN ENGLISH ##
+print('Removing non English songs')
 
 
-def sentence_counter(song):
-    # probably will also add , as a separator of sentences
-    sentence_list = re.split('[?!.:;]\n', song)
-    return list(filter(None, sentence_list))
+def lang_detector(song):
+    try:
+        language = langdetect.detect(song[:len(song) // 5])
+    except:
+        return False
+    if(language == 'en'):
+        return True
+    else:
+        return False
 
 
-#number of characters per song
-file['char_count'] = file['lyrics'].apply(len)
-
-#number of words per song
-file['word_count'] = file['lyrics'].apply(word_counter)
-
-#number of sentences per song
-file['sentence_count'] = file['lyrics'].apply(sentence_counter)
-
-#number of verses per song
-file['verse_count'] = file.lyrics.str.count('\n') + 1
-
-#avg number of characters
-avg_chars = file['char_count'].mean()
-
-#avg number of words
-avg_words = file['word_count'].mean()
-
-#avg number of sentences
-avg_sentences = file['sentence_count'].mean()
-
-#avg number of verses
-avg_verses = file['verse_count'].mean()
+file['isEnglish'] = file['lyrics'].apply(lang_detector)
+file = file[file['isEnglish'] == True]
+print('Current rows: {}'.format(file.shape[0]))
 
 
+##DROP OUTDATED COLUMNS ##
+file = file.drop('verse_count', 1)
+file = file.drop('char_count', 1)
+file = file.drop('isEnglish', 1)
 
 
-
-
-# print()
-
+## SAVE FILE TO CSV ##
+file.to_csv('dataset.csv', index=False)
 print('########### CLEANING COMPLETE ###########')
-file.to_csv('cleaned.csv', index=False)
