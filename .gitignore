@@ -1,5 +1,6 @@
 # glove db
 glove/
+.word_vectors_cache/
 
 # idea
 .idea/
