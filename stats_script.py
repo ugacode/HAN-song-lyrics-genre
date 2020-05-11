@@ -20,7 +20,6 @@ except:
 
 
 def word_counter(song):
-    # probably will also add , as a separator of sentences
     sentence_list = re.split('\n|\s', song)
     return len(list(filter(None, sentence_list)))
 
@@ -29,12 +28,6 @@ def sentence_counter(song):
     # probably will also add , as a separator of sentences
     sentence_list = re.split('[?!.:;]\n', song)
     return len(list(filter(None, sentence_list)))
-
-def genre_counter(genre):
-    if genre not in genres:
-        genres[genre] = 1
-    else:
-        genres[genre] += 1
 
 
 # number of characters per song
@@ -61,16 +54,20 @@ avg_sentences = file['sentence_count'].mean()
 # avg number of verses
 avg_verses = file['verse_count'].mean()
 
-genres = {}
+
+genres = file['genre'].value_counts()
+genres = pd.DataFrame(genres)
+genres = genres.rename(columns={'genre': 'num_songs'})
+##IMPORTANT##
+tmp = file[['genre', 'char_count', 'verse_count',
+            'word_count', 'sentence_count']].groupby('genre').mean()
+
+genres = genres.join(tmp)
+print(genres)
+# avg number of chars per genre
+#file.loc['custom_index', 'column_name']
 
 
-print('almost done')
-file['genre'].apply(genre_counter)
-
-
-
-
-
-plt.bar(range(len(genres)), list(genres.values()), align='center')
-plt.xticks(range(len(genres)), list(genres.keys()))
-plt.show()
+#plt.bar(range(len(genres)), list(genres.values()), align='center')
+#plt.xticks(range(len(genres)), list(genres.keys()))
+# plt.show()
