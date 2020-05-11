@@ -86,6 +86,6 @@ def test_word_average():
 
 # test_word_average()
 
-test_logistic_regerssion()
+# test_logistic_regerssion()
 
 # test_majority_classifier()
