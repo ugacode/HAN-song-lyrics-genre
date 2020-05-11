@@ -8,7 +8,7 @@ import pandas as pd
 
 JSON_FILE_PATH = '.\\dataset_metadata.json'
 MOCK_DATASET_PATH = '..\\lyrics\\MOCK.csv'
-LR_MODEL_PATH = '.\\models\\logistic_regression'
+LR_MODEL_PATH = '.\\models\\logistic_regression.model'
 
 
 def write_dataset_metadata():
@@ -86,6 +86,6 @@ def test_word_average():
 
 # test_word_average()
 
-# test_logistic_regerssion()
+test_logistic_regerssion()
 
 # test_majority_classifier()
