@@ -32,8 +32,7 @@ def test_network(model, test_data, test_labels):
             _, prediction = torch.max(probability, 1)
             if (prediction.item() == label.item()):
                 correct_predictions += 1
-        accuracy = correct_predictions / test_data_size
-        print(f'accuracy - {accuracy}')
+        accuracy = (correct_predictions / test_data_size) * 100
         return accuracy
 
 
@@ -74,5 +73,4 @@ class LogisticRegressionClassifier(nn.Module):
         return F.softmax(self.linear(song_word_average_batch), dim=1)
 
     def song_lyrics_to_word_average(self, song_lyrics):
-        # TODO: Test this on a single word vector
         return torch.from_numpy(np.mean(np.array(torch.cat([self.word_to_glove(word) for word in song_lyrics]).T), axis=1))

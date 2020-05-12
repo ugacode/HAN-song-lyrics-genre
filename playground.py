@@ -8,7 +8,7 @@ import pandas as pd
 
 JSON_FILE_PATH = '.\\dataset_metadata.json'
 MOCK_DATASET_PATH = '..\\lyrics\\MOCK.csv'
-LR_MODEL_PATH = '.\\models\\logistic_regression'
+LR_MODEL_PATH = '.\\models\\logistic_regression.model'
 
 
 def write_dataset_metadata():
@@ -61,6 +61,31 @@ def test_logistic_regerssion():
     accuracy = load_model_and_test(LR_MODEL_PATH, lyrics_test, labels_test)
     print(f'model accuracy after training - {accuracy}')
 
-#test_logistic_regerssion()
 
-#test_majority_classifier()
+def test_word_average():
+    lyrics = "hello hello hello"
+    other_lyrics = "hello hello world"
+    words = logistic_regresssion.lyrics_to_words(lyrics)
+    other_words = logistic_regresssion.lyrics_to_words(other_lyrics)
+    model = logistic_regresssion.LogisticRegressionClassifier()
+    word_average_lyrics = model.song_lyrics_to_word_average(words)
+    word_average_other_lyrics = model.song_lyrics_to_word_average(other_words)
+    word_average_word = model.song_lyrics_to_word_average(["hello"])
+    word_encoding = model.word_to_glove("hello")[0]
+
+    diff_lyrics_word_avg = (word_average_lyrics - word_average_word).sum()
+    diff_lyrics_word = (word_average_lyrics - word_encoding).sum()
+    diff_lyrics_other = (word_average_lyrics - word_average_other_lyrics).sum()
+    if (abs(diff_lyrics_word_avg) > 0.1):
+        print(f"Abnormal diff between lyrics and single word avg - {diff_lyrics_word_avg}")
+    if (abs(diff_lyrics_word) > 0.1):
+        print(f"Abnormal diff between lyrics and single word encoding - {diff_lyrics_word}")
+    if (abs(diff_lyrics_other) < 0.1):
+        print(f"Abnormal low diff between lyrics and other lyrics - {diff_lyrics_other}")
+    print("test over")
+
+# test_word_average()
+
+# test_logistic_regerssion()
+
+# test_majority_classifier()
