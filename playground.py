@@ -1,13 +1,16 @@
-from dataset_metadata import DatasetMetadata
+import datetime
+
+import majority_classifier
+from dataset_loader import LyricsDataset, WordAverageTransform
+from dataset_metadata import DatasetMetadata, JSON_FILE_PATH
+from learning_dataset_generator import LEARNING_DATASET_TRAIN_PATH, LEARNING_DATASET_TEST_PATH, \
+    LEARNING_SMALL_DATASET_TRAIN_PATH
 from majority_classifier import MajorityClassifier
 import logistic_regresssion
 
 import torch
 
-import pandas as pd
 
-JSON_FILE_PATH = '.\\dataset_metadata.json'
-MOCK_DATASET_PATH = '..\\lyrics\\MOCK.csv'
 LR_MODEL_PATH = '.\\models\\logistic_regression.model'
 
 
@@ -24,44 +27,42 @@ def load_dataset_from_file():
 
 
 def test_majority_classifier():
+    print(f'{datetime.datetime.now()} - starting majority classifier testing')
     classifier = MajorityClassifier(JSON_FILE_PATH)
-    print(f'Majority classifier test = {classifier.forward("THESE ARE LYRICS")}')
+    test_dataset = LyricsDataset(LEARNING_DATASET_TEST_PATH, WordAverageTransform())
+    accuracy = majority_classifier.test_network(classifier, test_dataset)
+    print(f'{datetime.datetime.now()} - Majority classifier accuracy = {accuracy}')
 
 
-def train_model_and_save(model_path, train_data, train_labels, test_data, test_labels):
+def train_model_and_save(model_path, train_dataset, test_dataset):
     model = logistic_regresssion.LogisticRegressionClassifier()
-    accuracy = logistic_regresssion.test_network(model, test_data, test_labels)
-    print(f'model accuracy before training - {accuracy}')
-    word_average_train_data = [model.song_lyrics_to_word_average(song) for song in train_data]
-    word_average_train_data_combined = torch.stack(word_average_train_data, dim=0)
-    model = logistic_regresssion.train_network(model, word_average_train_data_combined, train_labels, 10)
+    accuracy = logistic_regresssion.test_network(model, test_dataset)
+    print(f'{datetime.datetime.now()} - model accuracy before training - {accuracy}')
+    model = logistic_regresssion.train_network(model, train_dataset, 10)
+    print(f'{datetime.datetime.now()} - model finished training')
     torch.save(model.state_dict(), model_path)
 
 
-def load_model_and_test(model_path, test_data, test_labels):
+def load_model_and_test(model_path, test_dataset):
     model = logistic_regresssion.LogisticRegressionClassifier()
     model.load_state_dict(torch.load(model_path))
-    accuracy = logistic_regresssion.test_network(model, test_data, test_labels)
+    accuracy = logistic_regresssion.test_network(model, test_dataset)
     return accuracy
 
 
-def test_logistic_regerssion():
-    mock_data = pd.read_csv(MOCK_DATASET_PATH)
-    data_size = mock_data.shape[0]
-    train_index = int(data_size * 0.9)
-    # split into labels and lyrics
-    lyrics = mock_data['lyrics'].transform(logistic_regresssion.lyrics_to_words)
-    labels = mock_data['genre']
-    lyrics_train = lyrics[:train_index].to_numpy()
-    lyrics_test = lyrics[train_index:].to_numpy()
-    labels_train = labels[:train_index].to_numpy()
-    labels_test = labels[train_index:].to_numpy()
+def test_logistic_regression():
+    print(f'{datetime.datetime.now()} - starting logistic regression testing')
+    train_dataset = LyricsDataset(LEARNING_SMALL_DATASET_TRAIN_PATH, WordAverageTransform())
+    print(f'{datetime.datetime.now()} - loaded transformed training data')
+    test_dataset = LyricsDataset(LEARNING_DATASET_TEST_PATH, WordAverageTransform())
+    print(f'{datetime.datetime.now()} - loaded transformed testing data')
 
-    train_model_and_save(LR_MODEL_PATH, lyrics_train, labels_train, lyrics_test, labels_test)
-    accuracy = load_model_and_test(LR_MODEL_PATH, lyrics_test, labels_test)
-    print(f'model accuracy after training - {accuracy}')
+    train_model_and_save(LR_MODEL_PATH, train_dataset, test_dataset)
+    accuracy = load_model_and_test(LR_MODEL_PATH, test_dataset)
+    print(f'{datetime.datetime.now()} - model accuracy after training - {accuracy}')
 
 
+# TODO: this is now broken - change to test transformer
 def test_word_average():
     lyrics = "hello hello hello"
     other_lyrics = "hello hello world"
@@ -84,8 +85,7 @@ def test_word_average():
         print(f"Abnormal low diff between lyrics and other lyrics - {diff_lyrics_other}")
     print("test over")
 
-# test_word_average()
 
-# test_logistic_regerssion()
+# test_logistic_regression()
 
 # test_majority_classifier()

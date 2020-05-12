@@ -1,11 +1,11 @@
 import json
 
+JSON_FILE_PATH = '.\\dataset_metadata.json'
 
 class DatasetMetadata:
     def __init__(self, genre_labels=None, most_common_genre_id=0, song_count=100):
         if genre_labels is None:
-            genre_labels = ['genre_1', 'genre_2', 'genre_3', 'genre_4', 'genre_5', 'genre_6', 'genre_7',
-                            'genre_8', 'genre_9', 'genre_10']
+            genre_labels = ["Pop", "Hip-Hop", "Rock", "Metal", "Country", "Jazz", "Electronic", "Folk", "R&B", "Indie"]
         self.genre_labels = genre_labels
         self.most_common_genre_id = most_common_genre_id
         self.song_count = song_count
