@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import sys
 
 try:
-    file = pd.read_csv('dataset.csv')
+    df = pd.read_csv('dataset.csv')
 except:
     print('Dataset.csv not found')
     sys.exit()
@@ -31,41 +31,41 @@ def sentence_counter(song):
 
 
 # number of characters per song
-file['char_count'] = file['lyrics'].apply(len)
+df['char_count'] = df['lyrics'].apply(len)
 
 # number of words per song
-file['word_count'] = file['lyrics'].apply(word_counter)
+df['word_count'] = df['lyrics'].apply(word_counter)
 
 # number of sentences per song
-file['sentence_count'] = file['lyrics'].apply(sentence_counter)
+df['sentence_count'] = df['lyrics'].apply(sentence_counter)
 
 # number of verses per song
-file['verse_count'] = file.lyrics.str.count('\n') + 1
+df['verse_count'] = df.lyrics.str.count('\n') + 1
 
 # avg number of characters
-avg_chars = file['char_count'].mean()
+avg_chars = df['char_count'].mean()
 
 # avg number of words
-avg_words = file['word_count'].mean()
+avg_words = df['word_count'].mean()
 
 # avg number of sentences
-avg_sentences = file['sentence_count'].mean()
+avg_sentences = df['sentence_count'].mean()
 
 # avg number of verses
-avg_verses = file['verse_count'].mean()
+avg_verses = df['verse_count'].mean()
 
 
-genres = file['genre'].value_counts()
+genres = df['genre'].value_counts()
 genres = pd.DataFrame(genres)
 genres = genres.rename(columns={'genre': 'num_songs'})
 ##IMPORTANT##
-tmp = file[['genre', 'char_count', 'verse_count',
+tmp = df[['genre', 'char_count', 'verse_count',
             'word_count', 'sentence_count']].groupby('genre').mean()
 
 genres = genres.join(tmp)
 print(genres)
 # avg number of chars per genre
-#file.loc['custom_index', 'column_name']
+#df.loc['custom_index', 'column_name']
 
 
 #plt.bar(range(len(genres)), list(genres.values()), align='center')
