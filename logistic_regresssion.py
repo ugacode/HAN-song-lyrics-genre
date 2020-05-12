@@ -10,8 +10,8 @@ from nltk import sent_tokenize, word_tokenize
 from word_encoding import WordEncodingAuto
 
 WORD_EMBEDDING_SIZE = 100
-LEARNING_RATE = 0.01  # experiment with this
-BATCH_SIZE = 32
+LEARNING_RATE = 0.001  # experiment with this
+BATCH_SIZE = 128
 
 
 def lyrics_to_words(lyrics):
@@ -38,7 +38,8 @@ def test_network(model, test_data, test_labels):
 
 def train_network(model, train_data, train_labels, epochs):
     loss_function = nn.CrossEntropyLoss()
-    optimizer = optim.RMSprop(model.parameters(), lr=LEARNING_RATE)
+    #optimizer = optim.RMSprop(model.parameters(), lr=LEARNING_RATE)
+    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
     for epoch in range(epochs):
         model.zero_grad()
