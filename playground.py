@@ -1,6 +1,8 @@
 import datetime
 
 from dataset_metadata import DatasetMetadata, JSON_FILE_PATH
+from learning_dataset_generator import LEARNING_DATASET_TRAIN_PATH, LEARNING_DATASET_TEST_PATH, \
+    LEARNING_SMALL_DATASET_TRAIN_PATH
 from majority_classifier import MajorityClassifier
 import logistic_regresssion
 
@@ -9,7 +11,6 @@ import torch
 import pandas as pd
 
 
-MOCK_DATASET_PATH = '..\\lyrics\\MOCK.csv'
 LR_MODEL_PATH = '.\\models\\logistic_regression.model'
 
 
@@ -49,16 +50,13 @@ def load_model_and_test(model_path, test_data, test_labels):
 
 def test_logistic_regression():
     print(f'{datetime.datetime.now()} - starting logistic regression testing')
-    mock_data = pd.read_csv(MOCK_DATASET_PATH)
-    data_size = mock_data.shape[0]
-    train_index = int(data_size * 0.75)
+    train_data = pd.read_csv(LEARNING_SMALL_DATASET_TRAIN_PATH)
+    test_data = pd.read_csv(LEARNING_DATASET_TEST_PATH)
     # split into labels and lyrics
-    lyrics = mock_data['lyrics'].transform(logistic_regresssion.lyrics_to_words)
-    labels = mock_data['genre']
-    lyrics_train = lyrics[:train_index].to_numpy()
-    lyrics_test = lyrics[train_index:].to_numpy()
-    labels_train = labels[:train_index].to_numpy()
-    labels_test = labels[train_index:].to_numpy()
+    lyrics_train = train_data['lyrics'].transform(logistic_regresssion.lyrics_to_words).to_numpy()
+    labels_train = train_data['genre'].to_numpy()
+    lyrics_test = test_data['lyrics'].transform(logistic_regresssion.lyrics_to_words).to_numpy()
+    labels_test = test_data['genre'].to_numpy()
 
     train_model_and_save(LR_MODEL_PATH, lyrics_train, labels_train, lyrics_test, labels_test)
     accuracy = load_model_and_test(LR_MODEL_PATH, lyrics_test, labels_test)
