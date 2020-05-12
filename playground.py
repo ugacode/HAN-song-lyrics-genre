@@ -1,5 +1,6 @@
 import datetime
 
+import majority_classifier
 from dataset_loader import LyricsDataset, WordAverageTransform
 from dataset_metadata import DatasetMetadata, JSON_FILE_PATH
 from learning_dataset_generator import LEARNING_DATASET_TRAIN_PATH, LEARNING_DATASET_TEST_PATH, \
@@ -26,8 +27,11 @@ def load_dataset_from_file():
 
 
 def test_majority_classifier():
+    print(f'{datetime.datetime.now()} - starting majority classifier testing')
     classifier = MajorityClassifier(JSON_FILE_PATH)
-    print(f'Majority classifier test = {classifier.forward("THESE ARE LYRICS")}')
+    test_dataset = LyricsDataset(LEARNING_DATASET_TEST_PATH, WordAverageTransform())
+    accuracy = majority_classifier.test_network(classifier, test_dataset)
+    print(f'{datetime.datetime.now()} - Majority classifier accuracy = {accuracy}')
 
 
 def train_model_and_save(model_path, train_dataset, test_dataset):
@@ -48,7 +52,7 @@ def load_model_and_test(model_path, test_dataset):
 
 def test_logistic_regression():
     print(f'{datetime.datetime.now()} - starting logistic regression testing')
-    train_dataset = LyricsDataset(LEARNING_DATASET_TRAIN_PATH, WordAverageTransform())
+    train_dataset = LyricsDataset(LEARNING_SMALL_DATASET_TRAIN_PATH, WordAverageTransform())
     print(f'{datetime.datetime.now()} - loaded transformed training data')
     test_dataset = LyricsDataset(LEARNING_DATASET_TEST_PATH, WordAverageTransform())
     print(f'{datetime.datetime.now()} - loaded transformed testing data')
@@ -82,6 +86,6 @@ def test_word_average():
     print("test over")
 
 
-test_logistic_regression()
+# test_logistic_regression()
 
 # test_majority_classifier()
