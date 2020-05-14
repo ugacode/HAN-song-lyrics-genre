@@ -7,9 +7,11 @@ from learning_dataset_generator import LEARNING_DATASET_TRAIN_PATH, LEARNING_DAT
     LEARNING_SMALL_DATASET_TRAIN_PATH
 from majority_classifier import MajorityClassifier
 import logistic_regresssion
+import matplotlib.pyplot as plt
 
 import torch
 
+from plot_utils import plot_confusion_matrix
 
 LR_MODEL_PATH = '.\\models\\logistic_regression.model'
 
@@ -30,13 +32,19 @@ def test_majority_classifier():
     print(f'{datetime.datetime.now()} - starting majority classifier testing')
     classifier = MajorityClassifier(JSON_FILE_PATH)
     test_dataset = LyricsDataset(LEARNING_DATASET_TEST_PATH, WordAverageTransform())
-    accuracy = majority_classifier.test_network(classifier, test_dataset)
+    accuracy, confusion = majority_classifier.test_network(classifier, test_dataset)
+
+    #dm = DatasetMetadata.from_filepath(JSON_FILE_PATH)
+    #plt.figure(figsize=(10, 10))
+    #plot_confusion_matrix(confusion, dm.genre_labels, title="Logistic Regression Confusion Matrix")
+    #plt.show()
+
     print(f'{datetime.datetime.now()} - Majority classifier accuracy = {accuracy}')
 
 
 def train_model_and_save(model_path, train_dataset, test_dataset):
     model = logistic_regresssion.LogisticRegressionClassifier()
-    accuracy = logistic_regresssion.test_network(model, test_dataset)
+    accuracy, confusion = logistic_regresssion.test_network(model, test_dataset)
     print(f'{datetime.datetime.now()} - model accuracy before training - {accuracy}')
     model = logistic_regresssion.train_network(model, train_dataset, 10)
     print(f'{datetime.datetime.now()} - model finished training')
@@ -44,9 +52,15 @@ def train_model_and_save(model_path, train_dataset, test_dataset):
 
 
 def load_model_and_test(model_path, test_dataset):
+
     model = logistic_regresssion.LogisticRegressionClassifier()
     model.load_state_dict(torch.load(model_path))
-    accuracy = logistic_regresssion.test_network(model, test_dataset)
+    accuracy, confusion = logistic_regresssion.test_network(model, test_dataset)
+
+    # dm = DatasetMetadata.from_filepath(JSON_FILE_PATH)
+    # plt.figure(figsize=(10, 10))
+    # plot_confusion_matrix(confusion, dm.genre_labels, title="Logistic Regression Confusion Matrix")
+    # plt.show()
     return accuracy
 
 
@@ -86,6 +100,6 @@ def test_word_average():
     print("test over")
 
 
-# test_logistic_regression()
+test_logistic_regression()
 
 # test_majority_classifier()
