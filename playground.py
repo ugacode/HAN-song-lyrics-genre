@@ -34,10 +34,10 @@ def test_majority_classifier():
     test_dataset = LyricsDataset(LEARNING_DATASET_TEST_PATH, WordAverageTransform())
     accuracy, confusion = majority_classifier.test_network(classifier, test_dataset)
 
-    #dm = DatasetMetadata.from_filepath(JSON_FILE_PATH)
-    #plt.figure(figsize=(10, 10))
-    #plot_confusion_matrix(confusion, dm.genre_labels, title="Logistic Regression Confusion Matrix")
-    #plt.show()
+    dm = DatasetMetadata.from_filepath(JSON_FILE_PATH)
+    plt.figure(figsize=(10, 10))
+    plot_confusion_matrix(confusion, dm.genre_labels, title="Majority Classifier Confusion Matrix")
+    plt.show()
 
     print(f'{datetime.datetime.now()} - Majority classifier accuracy = {accuracy}')
 
@@ -57,16 +57,17 @@ def load_model_and_test(model_path, test_dataset):
     model.load_state_dict(torch.load(model_path))
     accuracy, confusion = logistic_regresssion.test_network(model, test_dataset)
 
-    # dm = DatasetMetadata.from_filepath(JSON_FILE_PATH)
-    # plt.figure(figsize=(10, 10))
-    # plot_confusion_matrix(confusion, dm.genre_labels, title="Logistic Regression Confusion Matrix")
-    # plt.show()
+    dm = DatasetMetadata.from_filepath(JSON_FILE_PATH)
+    plt.figure(figsize=(10, 10))
+    plot_confusion_matrix(confusion, dm.genre_labels, title="Logistic Regression Confusion Matrix")
+    plt.show()
     return accuracy
 
 
 def test_logistic_regression():
     print(f'{datetime.datetime.now()} - starting logistic regression testing')
-    train_dataset = LyricsDataset(LEARNING_SMALL_DATASET_TRAIN_PATH, WordAverageTransform())
+    #train_dataset = LyricsDataset(LEARNING_SMALL_DATASET_TRAIN_PATH, WordAverageTransform())
+    train_dataset = LyricsDataset(LEARNING_DATASET_TRAIN_PATH, WordAverageTransform())
     print(f'{datetime.datetime.now()} - loaded transformed training data')
     test_dataset = LyricsDataset(LEARNING_DATASET_TEST_PATH, WordAverageTransform())
     print(f'{datetime.datetime.now()} - loaded transformed testing data')
@@ -100,6 +101,6 @@ def test_word_average():
     print("test over")
 
 
-test_logistic_regression()
+# test_logistic_regression()
 
-# test_majority_classifier()
+test_majority_classifier()
