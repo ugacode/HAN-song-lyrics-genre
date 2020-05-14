@@ -16,10 +16,10 @@ class WordAverageTransform(object):
     word_encoder = WordEncodingAuto()
 
     def __call__(self, sample):
-        lyrics = sample['lyrics']
+        lyrics = sample[0]
         word_average = torch.from_numpy(
             np.mean(np.array(torch.cat([self.word_to_glove(word) for word in lyrics]).T), axis=1))
-        trans_sample = {'lyrics': word_average, 'genre': sample['genre']}
+        trans_sample = (word_average, sample[1])
         return trans_sample
 
     @staticmethod
@@ -37,9 +37,9 @@ class LyricsDataset(Dataset):
         self.transform_dynamically = transform_dynamically
         if (self.transform and (self.transform_dynamically == False)):
             for i in range(self.data_size):
-                transformed = self.transform({'lyrics': self.lyrics[i], 'genre': self.genres[i]})
-                self.lyrics[i] = transformed['lyrics']
-                self.genres[i] = transformed['genre']
+                transformed = self.transform((self.lyrics[i], self.genres[i]))
+                self.lyrics[i] = transformed[0]
+                self.genres[i] = transformed[1]
 
     def __len__(self):
         return self.data_size
@@ -48,7 +48,7 @@ class LyricsDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        sample = {'lyrics': self.lyrics[idx], 'genre': self.genres[idx]}
+        sample =  (self.lyrics[idx], self.genres[idx])
         if (self.transform and (self.transform_dynamically == True)):
             sample = self.transform(sample)
 
