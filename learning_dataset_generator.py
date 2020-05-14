@@ -14,7 +14,18 @@ def generate_learning_dataset():
     file = pd.read_csv(FULL_DATASET_PATH)
     field_drop = file.drop(columns=['index', 'song', 'artist'])
     genre_transform = field_drop.replace({'genre': replace_dict})
-    shuffled = genre_transform.sample(frac=1)
+    undersample_list = []
+    for genre_i in range(len(dm.genre_labels)):
+        genre_only = genre_transform.loc[genre_transform["genre"] == genre_i]
+        if (len(genre_only) > 13000):
+            genre_only = genre_only.sample(13000)
+        undersample_list.append(genre_only)
+
+    #not_rock = genre_transform.loc[genre_transform["genre"] != 2]
+    #rock = genre_transform.loc[genre_transform["genre"] == 2]
+    #rock_small = rock.sample(frac=0.3)
+    undersampled = pd.concat(undersample_list, axis=0)
+    shuffled = undersampled.sample(frac=1)
     dataset_size = genre_transform.shape[0]
     train_index = int(dataset_size * 0.75)
     shuffled.head(train_index).to_csv(LEARNING_DATASET_TRAIN_PATH, index=False)

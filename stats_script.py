@@ -12,8 +12,11 @@ import re
 import matplotlib.pyplot as plt
 import sys
 
+from learning_dataset_generator import LEARNING_DATASET_TRAIN_PATH, LEARNING_DATASET_TEST_PATH, \
+    LEARNING_SMALL_DATASET_TRAIN_PATH
+
 try:
-    df = pd.read_csv('dataset.csv')
+    df = pd.read_csv(LEARNING_DATASET_TRAIN_PATH)
 except:
     print('Dataset.csv not found')
     sys.exit()
