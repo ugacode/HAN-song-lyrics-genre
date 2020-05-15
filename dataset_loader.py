@@ -6,16 +6,32 @@ import numpy as np
 
 from word_encoding import WordEncodingAuto
 
+MAX_LINES = 60
+MAX_WORDS = 10
+
 WORD_ENCODE = WordEncodingAuto()
+
 
 
 def lyrics_to_words_lines(lyrics):
     lines = lyrics.split('\n')
-    words = [word_tokenize(line) for line in lines]
-    for line_i in range(len(words)):
+    words = [list(map(str.lower, word_tokenize(line))) for line in lines]
+    lines_count = len(words)
+    if (lines_count < MAX_LINES):
+        for _ in range(lines_count, MAX_LINES):
+            words.append(["PAD"])
+    else:
+        words = words[:MAX_LINES]
+    for line_i in range(MAX_LINES):
         current_line = words[line_i]
-        for word_i in range(len(current_line)):
-            words[line_i][word_i] = WORD_ENCODE.get_word_vector(words[line_i][word_i].lower())
+        line_length = len(current_line)
+        if (line_length < MAX_WORDS):
+            for _ in range(line_length, MAX_WORDS):
+                words[line_i].append("PAD")
+        else:
+            words[line_i] = words[line_i][:MAX_WORDS]
+        for word_i in range(MAX_WORDS):
+            words[line_i][word_i] = WORD_ENCODE.get_word_vector(words[line_i][word_i])
     return words
 
 
@@ -85,6 +101,6 @@ class LyricsDataset(Dataset):
 
         return sample
 
-#lyr = "Oh baby, how you doing?\nYou know I'm gonna cut right to the chase\nSome women were made but me, myself\nI like to think that I was created for a special purpose\nYou know, what's more special than you? You feel me\nIt's on baby, let's get lost\nYou don't need to call into work 'cause you're the boss\nFor real, want you to show me how you feel\nI consider myself lucky, that's a big deal\nWhy? Well, you got the key to my heart\nBut you ain't gonna need it, I'd rather you open up my body\nAnd show me secrets, you didn't know was inside\nNo need for me to lie\nIt's too big, it's too wide\nIt's too strong, it won't fit\nIt's too much, it's too tough\nHe talk like this 'cause he can back it up\nHe got a big ego, such a huge ego\nI love his big ego, it's too much\nHe walk like this 'cause he can back it up\nUsually I'm humble, right now I don't choose\nYou can leave with me or you could have the blues\nSome call it arrogant, I call it confident\nYou decide when you find on what I'm working with\nDamn I know I'm killing you with them legs\nBetter yet them thighs\nMatter a fact it's my smile or maybe my eyes\nBoy you a site to see, kind of something like me\nIt's too big, it's too wide\nIt's too strong, it won't fit\nIt's too much, it's too tough\nI talk like this 'cause I can back it up\nI got a big ego, such a huge ego\nBut he love my big ego, it's too much\nI walk like this 'cause I can back it up\nI, I walk like this 'cause I can back it up\nI, I talk like this 'cause I can back it up\nI, I can back it up, I can back it up\nI walk like this 'cause I can back it up\nIt's too big, it's too wide\nIt's too strong, it won't fit\nIt's too much, it's too tough\nHe talk like this 'cause he can back it up\nHe got a big ego, such a huge ego, such a huge ego\nI love his big ego, it's too much\nHe walk like this 'cause he can back it up\nEgo so big, you must admit\nI got every reason to feel like I'm that bitch\nEgo so strong, if you ain't know\nI don't need no beat, I can sing it with piano"
-#w = lyrics_to_words_lines(lyr)
-#a = 42
+# lyr = "Oh baby, how you doing?\nYou know I'm gonna cut right to the chase\nSome women were made but me, myself\nI like to think that I was created for a special purpose\nYou know, what's more special than you? You feel me\nIt's on baby, let's get lost\nYou don't need to call into work 'cause you're the boss\nFor real, want you to show me how you feel\nI consider myself lucky, that's a big deal\nWhy? Well, you got the key to my heart\nBut you ain't gonna need it, I'd rather you open up my body\nAnd show me secrets, you didn't know was inside\nNo need for me to lie\nIt's too big, it's too wide\nIt's too strong, it won't fit\nIt's too much, it's too tough\nHe talk like this 'cause he can back it up\nHe got a big ego, such a huge ego\nI love his big ego, it's too much\nHe walk like this 'cause he can back it up\nUsually I'm humble, right now I don't choose\nYou can leave with me or you could have the blues\nSome call it arrogant, I call it confident\nYou decide when you find on what I'm working with\nDamn I know I'm killing you with them legs\nBetter yet them thighs\nMatter a fact it's my smile or maybe my eyes\nBoy you a site to see, kind of something like me\nIt's too big, it's too wide\nIt's too strong, it won't fit\nIt's too much, it's too tough\nI talk like this 'cause I can back it up\nI got a big ego, such a huge ego\nBut he love my big ego, it's too much\nI walk like this 'cause I can back it up\nI, I walk like this 'cause I can back it up\nI, I talk like this 'cause I can back it up\nI, I can back it up, I can back it up\nI walk like this 'cause I can back it up\nIt's too big, it's too wide\nIt's too strong, it won't fit\nIt's too much, it's too tough\nHe talk like this 'cause he can back it up\nHe got a big ego, such a huge ego, such a huge ego\nI love his big ego, it's too much\nHe walk like this 'cause he can back it up\nEgo so big, you must admit\nI got every reason to feel like I'm that bitch\nEgo so strong, if you ain't know\nI don't need no beat, I can sing it with piano"
+# w = lyrics_to_words_lines(lyr)
+# a = 42
