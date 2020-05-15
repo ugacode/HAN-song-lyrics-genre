@@ -74,3 +74,7 @@ print(genres)
 #plt.bar(range(len(genres)), list(genres.values()), align='center')
 #plt.xticks(range(len(genres)), list(genres.keys()))
 # plt.show()
+
+# Plot Histogram on x
+#plt.hist(x, bins=50)
+#plt.gca().set(title='Frequency Histogram', ylabel='Frequency');

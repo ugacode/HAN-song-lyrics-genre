@@ -6,16 +6,28 @@ import numpy as np
 
 from word_encoding import WordEncodingAuto
 
+MAX_LINES = 60
+MAX_WORDS = 10
+
 WORD_ENCODE = WordEncodingAuto()
+
 
 
 def lyrics_to_words_lines(lyrics):
     lines = lyrics.split('\n')
-    words = [word_tokenize(line) for line in lines]
-    for line_i in range(len(words)):
+    words = [list(map(str.lower, word_tokenize(line))) for line in lines]
+    lines_count = len(words)
+    if (lines_count < MAX_LINES):
+        for _ in range(lines_count, MAX_LINES):
+            words.append(["PAD"])
+    for line_i in range(MAX_LINES):
         current_line = words[line_i]
-        for word_i in range(len(current_line)):
-            words[line_i][word_i] = WORD_ENCODE.get_word_vector(words[line_i][word_i].lower())
+        line_length = len(current_line)
+        if (line_length < MAX_WORDS):
+            for _ in range(line_length, MAX_WORDS):
+                words[line_i].append("PAD")
+        for word_i in range(MAX_WORDS):
+            words[line_i][word_i] = WORD_ENCODE.get_word_vector(words[line_i][word_i])
     return words
 
 
