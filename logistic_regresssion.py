@@ -5,6 +5,9 @@ import torch.optim as optim
 
 from torch.utils.data import DataLoader
 
+from ignite.engine import create_supervised_evaluator
+from ignite.metrics import Accuracy, ConfusionMatrix
+
 
 WORD_EMBEDDING_SIZE = 100
 LEARNING_RATE = 0.001  # experiment with this
@@ -13,18 +16,15 @@ BATCH_SIZE = 128
 
 def test_network(model, test_dataset):
     with torch.no_grad():
-        data_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
-        correct_predictions = 0
-        for _, sample_batched in enumerate(data_loader):
-            probability = model(sample_batched['lyrics'])
-            _, prediction = torch.max(probability, 1)
-            if (prediction.item() == sample_batched['genre']):
-                correct_predictions += 1
-        accuracy = (correct_predictions / len(data_loader)) * 100
-        return accuracy
+        evaluator = create_supervised_evaluator(
+            model, metrics={"accuracy": Accuracy(), "confusion": ConfusionMatrix(10)})
+        data_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
+        evaluator.run(data_loader)
+        return evaluator.state.metrics["accuracy"], evaluator.state.metrics["confusion"]
 
 
 def train_network(model, training_dataset, epochs):
+    model.train()
     loss_function = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
     data_loader = DataLoader(training_dataset, batch_size=BATCH_SIZE, shuffle=True)
@@ -32,8 +32,8 @@ def train_network(model, training_dataset, epochs):
     for epoch in range(epochs):
         model.zero_grad()
         for _, sample_batched in enumerate(data_loader):
-            training_batch = sample_batched['lyrics']
-            label_batch = sample_batched['genre']
+            training_batch = sample_batched[0]
+            label_batch = sample_batched[1]
             probabilities = model(training_batch)
             loss = loss_function(probabilities, label_batch)
             loss.backward()

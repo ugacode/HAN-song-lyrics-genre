@@ -3,8 +3,11 @@ import re
 import matplotlib.pyplot as plt
 import sys
 
+from learning_dataset_generator import LEARNING_DATASET_TRAIN_PATH, LEARNING_DATASET_TEST_PATH, \
+    LEARNING_SMALL_DATASET_TRAIN_PATH
+
 try:
-    df = pd.read_csv('dataset.csv')
+    df = pd.read_csv(LEARNING_DATASET_TRAIN_PATH)
 except:
     print('Dataset.csv not found')
     sys.exit()
@@ -55,3 +58,7 @@ print('Dataset shape {}'.format(df.shape))
 # plt.bar(range(len(genres)), list(genres.values()), align='center')
 # plt.xticks(range(len(genres)), list(genres.keys()))
 # plt.show()
+
+# Plot Histogram on x
+#plt.hist(x, bins=50)
+#plt.gca().set(title='Frequency Histogram', ylabel='Frequency');
