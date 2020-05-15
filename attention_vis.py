@@ -108,8 +108,11 @@ def visualize(in_sentences, in_wordweights, in_sentenceweights, sentenceLength =
 
 
 """example:"""
-sentences = ["1_word1","1_word2","1_word3","1_word4","1_word5","1_word6","2_word1","2_word2","2_word3","2_word4","2_word5","2_word6","3_word1","3_word2","3_word3","3_word4","3_word5","3_word6"]
+sentences = ["1_word1","1_word2","1_word3","1_word4","1_word5","1_word6","2_word1","2_word2","2_word3","2_word4","2_word5","2_word6","3_word1","3_word2","3_word3","3_word4","3_word5","3_word6","4_word1","4_word2","4_word3","4_word4","4_word5","4_word6","5_word1","5_word2","5_word3","5_word4","5_word5","5_word6","6_word1","6_word2","6_word3","6_word4","6_word5","6_word6"]
+
+#sentences = ["1_word1","1_word2","1_word3","1_word4","1_word5","1_word6","2_word1","2_word2","2_word3","2_word4","2_word5","2_word6","3_word1","3_word2","3_word3","3_word4","3_word5","3_word6"]
+
 wordweights = torch.randn([3,6])
-sentenceweights = torch.randn([1,3])
+sentenceweights = torch.randn([1,6])
 #print(len(sentences))
 visualize(sentences, wordweights, sentenceweights)
