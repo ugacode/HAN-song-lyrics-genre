@@ -7,7 +7,8 @@ from dataset_metadata import DatasetMetadata, JSON_FILE_PATH
 import hierarchical_attention_net
 from hierarchical_attention_net import HAN
 from learning_dataset_generator import LEARNING_DATASET_TRAIN_PATH, LEARNING_DATASET_TEST_PATH, \
-    LEARNING_SMALL_DATASET_TRAIN_PATH, LEARNING_TINY_DATASET_TRAIN_PATH, LEARNING_TINY_DATASET_TEST_PATH
+    LEARNING_SMALL_DATASET_TRAIN_PATH, LEARNING_TINY_DATASET_TRAIN_PATH, LEARNING_TINY_DATASET_TEST_PATH, \
+    LEARNING_SMALL_DATASET_TEST_PATH
 from majority_classifier import MajorityClassifier
 import logistic_regresssion
 import matplotlib.pyplot as plt
@@ -56,18 +57,18 @@ def load_HAN_and_test(model_path, test_dataset):
                 hierarchical_attention_net.BATCH_SIZE, hierarchical_attention_net.NUM_CLASSES,
                 word_embedding)
     model.load_state_dict(torch.load(model_path))
-    accuracy = hierarchical_attention_net.test_network(model, test_dataset)
+    accuracy, confusion = hierarchical_attention_net.test_network(model, test_dataset)
 
     dm = DatasetMetadata.from_filepath(JSON_FILE_PATH)
-    #plt.figure(figsize=(10, 10))
-    #plot_confusion_matrix(confusion, dm.genre_labels, title="HAN Confusion Matrix")
-    #plt.show()
+    plt.figure(figsize=(10, 10))
+    plot_confusion_matrix(confusion, dm.genre_labels, title="HAN Confusion Matrix")
+    plt.show()
     return accuracy
 
 
 def test_HAN(tiny=True):
-    test_dataset_path = LEARNING_DATASET_TEST_PATH
-    train_dataset_path = LEARNING_SMALL_DATASET_TRAIN_PATH
+    test_dataset_path = LEARNING_SMALL_DATASET_TEST_PATH
+    train_dataset_path = LEARNING_DATASET_TRAIN_PATH
     if(tiny):
         test_dataset_path = LEARNING_TINY_DATASET_TEST_PATH
         train_dataset_path = LEARNING_TINY_DATASET_TRAIN_PATH
@@ -78,7 +79,7 @@ def test_HAN(tiny=True):
     test_dataset = LyricsDatasetEmbeddedHAN(test_dataset_path, WORD_EMBEDDING_PATH)
     print(f'{datetime.datetime.now()} - loaded testing data')
 
-    train_HAN_and_save(HAN_MODEL_PATH, train_dataset, test_dataset)
+    # train_HAN_and_save(HAN_MODEL_PATH, train_dataset, test_dataset)
     accuracy = load_HAN_and_test(HAN_MODEL_PATH, test_dataset)
     print(f'{datetime.datetime.now()} - model accuracy after training - {accuracy}')
 
@@ -160,4 +161,4 @@ def test_word_average():
 
 # test_majority_classifier()
 
-test_HAN()
+test_HAN(False)

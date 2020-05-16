@@ -5,7 +5,7 @@ import torch.optim as optim
 import numpy as np
 
 from torch.utils.data import DataLoader
-from ignite.engine import create_supervised_evaluator
+from ignite.engine import Engine
 from ignite.metrics import Accuracy, ConfusionMatrix
 
 HIDDEN_SIZE = 50
@@ -17,23 +17,36 @@ BATCH_SIZE = 128
 
 
 def test_network(model, test_dataset):
-    with torch.no_grad():
+
+    def predict_on_batch(engine, batch):
         model.eval()
-        correct_predictions = 0
-        data_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
-        for lyrics, genres in data_loader:
+        with torch.no_grad():
+            lyrics = batch[0]
+            genres = batch[1]
+            if (torch.cuda.is_available()):
+                lyrics = lyrics.cuda()
+                genres = genres.cuda()
             samples_count = len(genres)
             model._init_hidden_state(samples_count)
-            _, predict = torch.max(model(lyrics), dim=1)
+            y_pred = model(lyrics)
+        return y_pred, genres
 
-            for i in range(samples_count):
-                if (predict[i] == genres[i]):
-                    correct_predictions += 1
-
-        return (correct_predictions / len(test_dataset)) * 100
+    evaluator = Engine(predict_on_batch)
+    with torch.no_grad():
+        if (torch.cuda.is_available()):
+            model.cuda()
+        Accuracy().attach(evaluator, "accuracy")
+        ConfusionMatrix(10).attach(evaluator, "confusion")
+        data_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
+        evaluator.run(data_loader)
+        return evaluator.state.metrics["accuracy"] * 100,  evaluator.state.metrics["confusion"]
 
 
 def train_network(model, training_dataset, epochs):
+    torch.manual_seed(42)
+    if (torch.cuda.is_available()):
+        model.cuda()
+
     model.train()
     loss_function = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
@@ -42,6 +55,10 @@ def train_network(model, training_dataset, epochs):
     for epoch in range(epochs):
         model.zero_grad()
         for lyrics, genres in data_loader:
+            if (torch.cuda.is_available()):
+                lyrics = lyrics.cuda()
+                genres = genres.cuda()
+
             samples_count = len(genres)
             model._init_hidden_state(samples_count)
             probabilities = model(lyrics)

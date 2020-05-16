@@ -16,7 +16,7 @@ def test_network(model, test_dataset):
             model, metrics={"accuracy": Accuracy(), "confusion": ConfusionMatrix(10)})
         data_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
         evaluator.run(data_loader)
-        return evaluator.state.metrics["accuracy"], evaluator.state.metrics["confusion"]
+        return evaluator.state.metrics["accuracy"] * 100, evaluator.state.metrics["confusion"]
 
 
 class MajorityClassifier(nn.Module):
