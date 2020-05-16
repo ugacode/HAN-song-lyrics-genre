@@ -5,6 +5,7 @@ from dataset_metadata import DatasetMetadata, JSON_FILE_PATH
 FULL_DATASET_PATH = '..\\lyrics\\dataset_clean.csv'
 LEARNING_DATASET_TRAIN_PATH = '..\\lyrics\\learn_train.csv'
 LEARNING_DATASET_TEST_PATH = '..\\lyrics\\learn_test.csv'
+LEARNING_SMALL_DATASET_TEST_PATH = '..\\lyrics\\learn_small_test.csv'
 LEARNING_TINY_DATASET_TEST_PATH = '..\\lyrics\\learn_tiny_test.csv'
 LEARNING_SMALL_DATASET_TRAIN_PATH = '..\\lyrics\\learn_small_train.csv'
 LEARNING_TINY_DATASET_TRAIN_PATH = '..\\lyrics\\learn_tiny_train.csv'
@@ -33,5 +34,7 @@ def generate_learning_dataset():
     shuffled.head(int(train_index * 0.4)).to_csv(LEARNING_SMALL_DATASET_TRAIN_PATH, index=False)
     shuffled.head(int(train_index * 0.02)).to_csv(LEARNING_TINY_DATASET_TRAIN_PATH, index=False)
     shuffled.tail(int((dataset_size - train_index) * 0.05)).to_csv(LEARNING_TINY_DATASET_TEST_PATH, index=False)
+    shuffled.tail(int((dataset_size - train_index) * 0.25)).to_csv(LEARNING_SMALL_DATASET_TEST_PATH, index=False)
+
 
 generate_learning_dataset()
