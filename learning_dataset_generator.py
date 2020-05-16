@@ -28,6 +28,7 @@ def generate_learning_dataset():
     dataset_size = genre_transform.shape[0]
     train_index = int(dataset_size * 0.75)
     shuffled.head(train_index).to_csv(LEARNING_DATASET_TRAIN_PATH, index=False)
+
     shuffled.tail(dataset_size-train_index).to_csv(LEARNING_DATASET_TEST_PATH, index=False)
     shuffled.head(int(train_index * 0.4)).to_csv(LEARNING_SMALL_DATASET_TRAIN_PATH, index=False)
     shuffled.head(int(train_index * 0.02)).to_csv(LEARNING_TINY_DATASET_TRAIN_PATH, index=False)
