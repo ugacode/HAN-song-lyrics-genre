@@ -10,7 +10,7 @@ from ignite.metrics import Accuracy, ConfusionMatrix
 
 
 WORD_EMBEDDING_SIZE = 100
-LEARNING_RATE = 0.001  # experiment with this
+LEARNING_RATE = 0.001
 BATCH_SIZE = 128
 
 
