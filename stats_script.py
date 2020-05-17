@@ -1,12 +1,19 @@
 import re
 import statistics
 import sys
+<<<<<<< HEAD
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from nltk import word_tokenize
 from collections import Counter
 from learning_dataset_generator import LEARNING_DATASET_TRAIN_PATH, LEARNING_DATASET_TEST_PATH, LEARNING_SMALL_DATASET_TRAIN_PATH, FULL_DATASET_PATH
+=======
+
+from learning_dataset_generator import LEARNING_DATASET_TRAIN_PATH, LEARNING_DATASET_TEST_PATH, \
+    LEARNING_SMALL_DATASET_TRAIN_PATH, LEARNING_TINY_DATASET_TRAIN_PATH, LEARNING_TINY_DATASET_TEST_PATH, \
+    LEARNING_SMALL_DATASET_TEST_PATH
+>>>>>>> 4ab7590507fb57d78f3002be4ef37257bff6ab30
 
 try:
     df = pd.read_csv(FULL_DATASET_PATH)

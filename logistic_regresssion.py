@@ -9,8 +9,10 @@ from ignite.engine import create_supervised_evaluator
 from ignite.metrics import Accuracy, ConfusionMatrix
 
 
+import visualizer as vis
+
 WORD_EMBEDDING_SIZE = 100
-LEARNING_RATE = 0.001  # experiment with this
+LEARNING_RATE = 0.001
 BATCH_SIZE = 128
 
 
@@ -20,7 +22,7 @@ def test_network(model, test_dataset):
             model, metrics={"accuracy": Accuracy(), "confusion": ConfusionMatrix(10)})
         data_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False)
         evaluator.run(data_loader)
-        return evaluator.state.metrics["accuracy"], evaluator.state.metrics["confusion"]
+        return evaluator.state.metrics["accuracy"] * 100, evaluator.state.metrics["confusion"]
 
 
 def train_network(model, training_dataset, epochs):
@@ -28,6 +30,8 @@ def train_network(model, training_dataset, epochs):
     loss_function = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
     data_loader = DataLoader(training_dataset, batch_size=BATCH_SIZE, shuffle=True)
+
+    loss_List = list()
 
     for epoch in range(epochs):
         model.zero_grad()
@@ -38,6 +42,11 @@ def train_network(model, training_dataset, epochs):
             loss = loss_function(probabilities, label_batch)
             loss.backward()
             optimizer.step()
+
+        print(loss.item())
+        loss_List.append(loss.item())
+        # plot_loss(loss.item())
+    vis.plotLoss(loss_List)
 
     return model
 
