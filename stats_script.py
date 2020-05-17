@@ -1,14 +1,17 @@
-import pandas as pd
 import re
-import matplotlib.pyplot as plt
+import statistics
 import sys
-
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+from nltk import word_tokenize
+from collections import Counter
 from learning_dataset_generator import LEARNING_DATASET_TRAIN_PATH, LEARNING_DATASET_TEST_PATH, \
     LEARNING_SMALL_DATASET_TRAIN_PATH, LEARNING_TINY_DATASET_TRAIN_PATH, LEARNING_TINY_DATASET_TEST_PATH, \
     LEARNING_SMALL_DATASET_TEST_PATH
 
 try:
-    df = pd.read_csv(LEARNING_DATASET_TRAIN_PATH)
+    df = pd.read_csv(FULL_DATASET_PATH)
 except:
     print('Dataset.csv not found')
     sys.exit()
@@ -52,14 +55,38 @@ tmp = tmp.rename(columns={'char_count': 'char_avg',
 genres = genres.join(tmp)
 print(genres)
 print('Dataset shape {}'.format(df.shape))
-# avg number of chars per genre
-#df.loc['custom_index', 'column_name']
+
+word_series = pd.Series()
+word_array = []
 
 
-# plt.bar(range(len(genres)), list(genres.values()), align='center')
-# plt.xticks(range(len(genres)), list(genres.keys()))
-# plt.show()
+def splitter(song):
+    line_list = song.split('\n')
+    output = []
+    for line in line_list:
+        output.append(len(word_tokenize(line)))
+    return np.array(output)
 
-# Plot Histogram on x
-#plt.hist(x, bins=50)
-#plt.gca().set(title='Frequency Histogram', ylabel='Frequency');
+
+word_array_series = df['lyrics'].apply(splitter)
+
+word_array = np.array([0])
+for array in word_array_series:
+    word_array = np.concatenate((word_array, array))
+
+word_array_series = pd.Series(word_array)
+word_count_series = word_array_series.value_counts()
+print('the most common number of words is: {}'.format(
+    word_count_series[word_count_series == max(word_count_series)]))
+
+word_count_series = word_count_series.sort_index()
+word_count_series.plot.bar()
+plt.show()
+
+
+line_count_series = df['line_count'].value_counts()
+print('the most common number of lines is: {}'.format(
+    line_count_series[line_count_series == max(line_count_series)]))
+line_count_series = line_count_series.sort_index()
+line_count_series.plot.bar()
+plt.show()

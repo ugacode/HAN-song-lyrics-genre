@@ -98,11 +98,13 @@ class LyricsDatasetEmbeddedHAN(Dataset):
 
         # pad lines
         if len(lyrics_encode) < MAX_LINES:
-            line_padding = [[-1 for _ in range(MAX_WORDS)] for _ in range(MAX_LINES - len(lyrics_encode))]
+            line_padding = [
+                [-1 for _ in range(MAX_WORDS)] for _ in range(MAX_LINES - len(lyrics_encode))]
             lyrics_encode.extend(line_padding)
 
         # truncate
-        lyrics_encode = [lines[:MAX_WORDS] for lines in lyrics_encode][:MAX_LINES]
+        lyrics_encode = [lines[:MAX_WORDS]
+                         for lines in lyrics_encode][:MAX_LINES]
 
         lyrics_encode = np.stack(arrays=lyrics_encode, axis=0)
         lyrics_encode += 1
