@@ -12,7 +12,6 @@ MAX_WORDS = 10
 WORD_ENCODE = WordEncodingAuto()
 
 
-
 def lyrics_to_words_lines(lyrics):
     lines = lyrics.split('\n')
     words = [list(map(str.lower, word_tokenize(line))) for line in lines]
@@ -31,7 +30,8 @@ def lyrics_to_words_lines(lyrics):
         else:
             words[line_i] = words[line_i][:MAX_WORDS]
         for word_i in range(MAX_WORDS):
-            words[line_i][word_i] = WORD_ENCODE.get_word_vector(words[line_i][word_i])
+            words[line_i][word_i] = WORD_ENCODE.get_word_vector(
+                words[line_i][word_i])
     return words
 
 
@@ -60,7 +60,8 @@ class LyricsDatasetHAN(Dataset):
         self.word_encoder = WordEncodingAuto()
         data = pd.read_csv(csv_file)
         self.data_size = data.shape[0]
-        self.lyrics = data['lyrics'].transform(lyrics_to_words_lines).to_numpy()
+        self.lyrics = data['lyrics'].transform(
+            lyrics_to_words_lines).to_numpy()
         self.genres = data['genre'].to_numpy()
 
     def __len__(self):
@@ -95,7 +96,7 @@ class LyricsDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        sample =  (self.lyrics[idx], self.genres[idx])
+        sample = (self.lyrics[idx], self.genres[idx])
         if (self.transform and (self.transform_dynamically == True)):
             sample = self.transform(sample)
 
