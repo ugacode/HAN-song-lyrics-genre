@@ -1,5 +1,7 @@
 import datetime
 
+from torch.utils.data import DataLoader
+
 import majority_classifier
 from dataset_loader import LyricsDataset, WordAverageTransform, LyricsDatasetEmbeddedHAN
 import dataset_loader
@@ -22,6 +24,7 @@ from plot_utils import plot_confusion_matrix
 WORD_EMBEDDING_PATH = '.\\glove\\glove.6B.100d.txt'
 LR_MODEL_PATH = '.\\models\\logistic_regression.model'
 HAN_MODEL_PATH = '.\\models\\han.model'
+DEMO_PATH = '..\\lyrics\\demo.csv'
 
 
 def write_dataset_metadata():
@@ -55,6 +58,37 @@ def load_HAN_and_test(model_path, test_dataset):
     plot_confusion_matrix(confusion, dm.genre_labels, title="HAN Confusion Matrix")
     plt.show()
     return accuracy
+
+
+def HAN_Demo():
+    model_path = HAN_MODEL_PATH
+    word_embedding = pd.read_csv(WORD_EMBEDDING_PATH, header=None, sep=" ", quoting=csv.QUOTE_NONE).values[:, 1:]
+    model = HAN(hierarchical_attention_net.HIDDEN_SIZE, hierarchical_attention_net.HIDDEN_SIZE,
+                hierarchical_attention_net.BATCH_SIZE, hierarchical_attention_net.NUM_CLASSES,
+                word_embedding)
+    model.load_state_dict(torch.load(model_path))
+    demo_dataset_path = LEARNING_SMALL_DATASET_TEST_PATH
+    demo_dataset = LyricsDatasetEmbeddedHAN(demo_dataset_path, WORD_EMBEDDING_PATH)
+
+    data_loader = DataLoader(demo_dataset, batch_size=128, shuffle=False)
+
+    model.eval()
+    if (torch.cuda.is_available()):
+        model.cuda()
+
+    genre = 0
+    for _, sample_batched in enumerate(data_loader):
+        if (_ == 0):
+            if (torch.cuda.is_available()):
+                lyrics = sample_batched[0].cuda()
+            probability = model(lyrics)
+            _, prediction = torch.max(probability, 1)
+            genre = prediction[0]
+
+    dm = DatasetMetadata.from_filepath(JSON_FILE_PATH)
+    genre = dm.genre_labels[genre]
+    print(f"Genre is {genre}!")
+
 
 
 def test_HAN(tiny=True):
@@ -128,4 +162,6 @@ def test_logistic_regression():
 
 # test_majority_classifier()
 
-test_HAN(False)
+# test_HAN(False)
+
+HAN_Demo()

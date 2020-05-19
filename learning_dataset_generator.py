@@ -37,4 +37,4 @@ def generate_learning_dataset():
     shuffled.tail(int((dataset_size - train_index) * 0.25)).to_csv(LEARNING_SMALL_DATASET_TEST_PATH, index=False)
 
 
-generate_learning_dataset()
+# generate_learning_dataset()
